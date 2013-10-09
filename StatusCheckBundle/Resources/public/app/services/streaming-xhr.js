@@ -48,38 +48,4 @@ app.factory('streamingXhr', function() {
 
     }
     return srvc;
-
-
-//    var srvc = {
-//        xhr: xhr,
-//        data: {},
-//        setData: function(data) {
-//            this.data = data;
-//        },
-//        send: function(callback) {
-//            if (typeof callback === 'function') {
-//                callback();
-//            }
-//        }
-//    }
-//
-//
-//    var read = 0;
-//    var incoming = '';
-//    xhr.onreadystatechange = function() {
-//        if (xhr.readyState == 3) {
-//            var incoming = xhr.responseText.substring(read);
-//            try {
-//                var split = incoming.split('\n');
-//                for (i = 1; i < split.length; i++) {
-//                    var r = JSON.parse(split[i]);
-//                    var newLi = $('<li/>').text(r.request_url + ' - ' + r.status).appendTo(container);
-//                }
-//            } catch (e) {
-//            }
-//            read = xhr.responseText.length;
-//        }
-//    };
-//    xhr.open('GET', '/app_dev.php/check-status', true);
-//    xhr.send();
 });
