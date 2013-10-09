@@ -19,18 +19,24 @@ class CheckController extends Controller {
 
     // Get request, made for testing
     public function indexAction() {
-        $hosts = ['www.smgbonline.com'];
+
+        $hosts = [];
         $batch = new CheckBatch();
         foreach ($hosts as $host) {
             $batch->addHost(new Host($host));
         }
 
         $checker = new StatusChecker($batch, true);
-        $first = true;
+        
+        // works for local apache
         ob_implicit_flush(true);
         foreach ($checker->check() as $response) {
-            echo "\n" . json_encode($response);
-            $first = false;
+            // Has to be padded on remote server, it won't flush it otherwise
+            echo str_pad("\n" . json_encode($response), 1024);
+            // works for litespeed on GS
+            @ob_flush();
+            flush();
+            // -----------------------
         };
         ob_implicit_flush(false);
         exit();
@@ -42,7 +48,7 @@ class CheckController extends Controller {
         $hosts = $request->request->get('hosts', []);
         if (empty($hosts)) {
             exit();
-        } elseif(count($hosts) > 1000){
+        } elseif (count($hosts) > 1000) {
             return json_encode('too_many_hosts');
         }
 
@@ -57,11 +63,13 @@ class CheckController extends Controller {
         }
 
         $checker = new StatusChecker($batch);
-        $first = true;
         ob_implicit_flush(true);
         foreach ($checker->check() as $response) {
-            echo "\n" . json_encode($response);
-            $first = false;
+            echo str_pad("\n" . json_encode($response), 1024);
+            // works for litespeed on GS
+            @ob_flush();
+            flush();
+            // -----------------------
         };
         ob_implicit_flush(false);
         exit();
