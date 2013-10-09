@@ -1,0 +1,75 @@
+/* 
+    Document   : main
+    Created on : Oct 7, 2013, 10:21:50 PM
+    Author     : ivan
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+@media (min-width: 1200px){
+
+    .container {
+        max-width: 80%;
+    }
+}
+
+
+
+.scrollable-block {
+    max-height: 400px;
+    resize: vertical;
+    width: 100%;
+}
+
+.button-container{
+    margin: 2em 0em;
+}
+.button-container .btn {
+    margin-left: 1em;
+}
+
+.input-warning {
+    max-width: 200px;
+}
+
+#results_table td{
+    max-witdh: 350px;
+}
+#control_container, #pagination_holder{
+    margin: 2em 0em 0em 0em;
+}
+#pagination_holder{
+    margin-bottom: 2em;
+    margin-top: 0em;
+}
+
+.mt20{
+    margin-top:20px;
+}
+.mr1em {
+    margin-right: 1em;
+}
+.col-cl, .col-stc, .col-id, .col-status, .col-url{
+    overflow-x: auto;
+}
+.col-cl, .col-stc{
+    width: 100px;
+}
+.col-id{
+    width:120px;
+}
+.col-status {
+    width: 150px;
+}
+#progress{
+    width:100%;
+    top: -2em;
+}
+.progress-bar{
+    padding-top:2px;
+}
+.redirection-parent {
+    vertical-align: sub;
+    font-size: .8em;
+    margin-left: -12px;
+}

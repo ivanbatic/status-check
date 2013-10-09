@@ -1,0 +1,100 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html ng-app="checker">
+    <head>
+        <title>Status Check Bundle</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js"></script>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></script>
+    {% javascripts 
+    '@ivanbaticStatusCheckBundle/Resources/public/app/*' 
+    '@ivanbaticStatusCheckBundle/Resources/public/app/controllers/*' 
+    '@ivanbaticStatusCheckBundle/Resources/public/app/directives/*' 
+    '@ivanbaticStatusCheckBundle/Resources/public/app/services/*' 
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    {% stylesheets '@ivanbaticStatusCheckBundle/Resources/public/css/*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+</head>
+<body>
+    <div class="container" ng-controller="SiteInputCtrl">
+        <div class="page-header">
+            <h1>Status Checker</h1>
+            <p class="lead">Symfony2 Bundle for fetching website content</p>
+        </div>
+
+        <h3>Website List</h3>
+        <p>Please enter one address per row. Currently: <span ng-class="{'text-danger': entries > 1000}" ng-bind="entries"></span></p>
+        <div class="row">
+            <div class="col-lg-6 clearfix">
+                <form ng-submit="submitForm()" class="clearfix" >
+                    <!--
+                    Can't use ng-list here, there's a bug in Angular, 
+                    cntrl->view binding has hardcoded comma as a delimiter, 
+                    no time to fix it now
+                    -->
+                    <textarea tabindex="1" class="scrollable-block form-control" rows="5" wrap="off" required textarea-autoresize ng-model="input"></textarea>
+                    <div class="button-container clearfix" id="control_container">
+                        <span ng-bind="inputStatus" class="pull-left hidden-xs text-danger input-warning"></span>
+                        <button type="submit" tabindex="2" class="btn btn-primary pull-right" ng-disabled="entries > 1000">Start the Awesomness</button>
+                        <button type="reset" tabindex="3" class="btn btn-default pull-right">Reset</button>
+                        <button ng-click="filterForm()" type="button" tabindex="4" class="btn btn-default pull-right">Filter</button>
+                    </div>
+                </form>
+                <div class="clearfix pull-right" id="pagination_holder">
+                    <button type="button" ng-click="newPage()" class="mt20 mr1em btn pull-right btn-primary">New Page</button>
+                    <button ng-show="pages.length > 1" ng-click="closePage()" type="button" class="mt20 mr1em btn-danger btn pull-right">Close Page</button>
+                    <ul class="pagination pull-right mr1em" ng-show="pages.length > 1">
+                        <li ng-class="{active: $index == activePage}" ng-click="setActivePage($index)" ng-repeat="page in pages"><a href="#" ng-bind="$index+1"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="progress" id="progress" ng-class="getProgressClass()">
+                    <div class="progress-bar" role="progressbar" ng-bind="getProgressText()" ng-style="getProgressPercentage()">
+                        <span class="progress-text" ng-bind="getProgressText()"></span>
+                    </div>
+                </div>
+                <table class="table clearfix table-bordered" id="results_table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Status</th>
+                            <th>Http Code</th>
+                            <th>Content Length</th>
+                            <th>Request URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="check in pages[activePage].records" ng-class="tableClass(check.status)">
+                            <td class="col-id">
+                                <span ng-bind="check.id"></span>
+                                <span ng-show="check.parent_id" class="glyphicon glyphicon-sort-by-attributes-alt">
+                                    <span ng-bind=" '(' + check.parent_id+ ')' " class="redirection-parent"></span>
+                                </span>
+                            </td>
+                            <td class="col-status">
+                                <span ng-bind="check.status"></span>
+                                <span ng-show="check.info" class="text-muted"><br/>(<span ng-bind="check.info"></span>)</span>
+
+                            </td>
+                            <td ng-bind="check.status_code" class="col-stc"></td>
+                            <td ng-bind="check.content_length" class="col-cl"></td>
+                            <td ng-bind="check.request_url" class='col-url' style='max-width: 200px;'></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> <!-- /container -->
+</body>
+</html>
