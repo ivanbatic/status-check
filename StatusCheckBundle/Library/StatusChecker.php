@@ -89,12 +89,20 @@ class StatusChecker {
                 }
                 // Open a socket
                 try {
-                    $ip = self::getAddrByHost($host->getHost());
+                    
+                    // Doesn't work on remote host
+                     $ip = self::getAddrByHost($host->getHost());
+                    
+                    // Should work on remote host, but timeout is really bad
+                    // sh...geekstorage resolves everything
+//                    $ip = filter_var(gethostbyname($host->getHost(), FILTER_VALIDATE_IP));
+                    
                     if ($ip === false) {
                         yield $failConnection($index, CheckResponse::CHECK_INVALID_HOST);
                         continue;
                     }
-                    $openSockets[$index] = $unsentRequestsToSockets[$index] = stream_socket_client($host->getHttpRequestHost($ip), $errno, $errstr, self::SOCKET_OPEN_TIMEOUT, $flags);
+                    $h = $host->getHttpRequestHost($ip);
+                    $openSockets[$index] = $unsentRequestsToSockets[$index] = stream_socket_client($h, $errno, $errstr, self::SOCKET_OPEN_TIMEOUT, $flags);
                     stream_set_blocking($openSockets[$index], 0);
                     $this->responses[$index]->setStatus(CheckResponse::CHECK_SOCKET_OPEN);
                 } catch (\Exception $e) {
@@ -238,7 +246,9 @@ class StatusChecker {
         $matches = [];
         $result = false;
         $query = shell_exec("nslookup -timeout={$timeout} -retry=1 {$host}");
+        
         if (preg_match('/\nAddress: (.*)\n/', $query, $matches)) {
+            
             $result = trim($matches[1]);
         }
         $filtered = filter_var($result, FILTER_VALIDATE_IP);
