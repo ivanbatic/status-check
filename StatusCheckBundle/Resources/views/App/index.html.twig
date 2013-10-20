@@ -25,17 +25,17 @@ and open the template in the editor.
     {% endstylesheets %}
 </head>
 <body>
-    <div class="container" ng-controller="SiteInputCtrl">
+    <div class="container" ng-controller="AppController">
         <div class="page-header">
             <h1>Status Checker</h1>
             <p class="lead">Symfony2 Bundle for fetching website content</p>
         </div>
 
         <h3>Website List</h3>
-        <p>Please enter one address per row. Currently: <span ng-class="{'text-danger': entries > 1000}" ng-bind="entries"></span></p>
         <div class="row">
             <div class="col-lg-6 clearfix">
-                <form ng-submit="submitForm()" class="clearfix" >
+                <form ng-submit="submitForm()" class="clearfix" ng-controller="InputController" >
+                    <p>Please enter one address per row. Currently: <span ng-class="{'text-danger': entries > 1000}" ng-bind="entries"></span></p>
                     <!--
                     Can't use ng-list here, there's a bug in Angular, 
                     cntrl->view binding has hardcoded comma as a delimiter, 
@@ -46,18 +46,18 @@ and open the template in the editor.
                         <span ng-bind="inputStatus" class="pull-left hidden-xs text-danger input-warning"></span>
                         <button type="submit" tabindex="2" class="btn btn-primary pull-right" ng-disabled="entries > 1000">Start the Awesomness</button>
                         <button type="reset" tabindex="3" class="btn btn-default pull-right">Reset</button>
-                        <button ng-click="filterForm()" type="button" tabindex="4" class="btn btn-default pull-right">Filter</button>
+                        <button ng-click="filterInput()" type="button" tabindex="4" class="btn btn-default pull-right">Filter</button>
                     </div>
                 </form>
-                <div class="clearfix pull-right" id="pagination_holder">
-                    <button type="button" ng-click="newPage()" class="mt20 mr1em btn pull-right btn-primary">New Page</button>
+                <div class="clearfix pull-right" id="pagination_holder" ng-controller="PageController">
+                    <button type="button" ng-click="createPage()" class="mt20 mr1em btn pull-right btn-primary">New Page</button>
                     <button ng-show="pages.length > 1" ng-click="closePage()" type="button" class="mt20 mr1em btn-danger btn pull-right">Close Page</button>
                     <ul class="pagination pull-right mr1em" ng-show="pages.length > 1">
                         <li ng-class="{active: $index == activePage}" ng-click="setActivePage($index)" ng-repeat="page in pages"><a href="#" ng-bind="$index+1"></a></li>
                     </ul>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6" ng-controller="ResponseTableController">
                 <div class="progress" id="progress" ng-class="getProgressClass()">
                     <div class="progress-bar" role="progressbar" ng-bind="getProgressText()" ng-style="getProgressPercentage()">
                         <span class="progress-text" ng-bind="getProgressText()"></span>
