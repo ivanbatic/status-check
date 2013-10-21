@@ -12,7 +12,8 @@ use ivanbatic\StatusCheckBundle\Model\CheckBatch;
 use ivanbatic\StatusCheckBundle\Model\CheckResponse;
 use ivanbatic\StatusCheckBundle\Model\Host;
 
-class StatusChecker {
+class StatusChecker
+{
 
     const SOCKET_OPEN_TIMEOUT = 2; // timeout for opening a socket
     const SOCKET_READ_INTERVAL = 500000; // in microseconds
@@ -25,22 +26,26 @@ class StatusChecker {
     /** @var CheckResponse */
     protected $responses = [];
 
-    public function __construct(CheckBatch $batch) {
+    public function __construct(CheckBatch $batch)
+    {
         $this->hosts = $batch;
     }
 
-    public static function createHttpRequest($type = 'HEAD', $host, $path = '/', $httpVersion = '1.0') {
+    public static function createHttpRequest($type = 'HEAD', $host, $path = '/', $httpVersion = '1.0')
+    {
         $request = "{$type} {$path} HTTP/{$httpVersion}\r\n" .
             "Host: {$host}\r\n" .
             "Connection: close\r\n\r\n";
         return $request;
     }
 
-    public static function utimeInMs() {
+    public static function utimeInMs()
+    {
         return round(microtime(true) * 1000);
     }
 
-    protected function run() {
+    protected function run()
+    {
         // Set async flag
         $flags = STREAM_CLIENT_ASYNC_CONNECT;
         // Init referenced vars
@@ -89,14 +94,14 @@ class StatusChecker {
                 }
                 // Open a socket
                 try {
-                    
+
                     // Doesn't work on remote host
-                     $ip = self::getAddrByHost($host->getHost());
-                    
+                    $ip = self::getAddrByHost($host->getHost());
+
                     // Should work on remote host, but timeout is really bad
                     // sh...geekstorage resolves everything
 //                    $ip = filter_var(gethostbyname($host->getHost(), FILTER_VALIDATE_IP));
-                    
+
                     if ($ip === false) {
                         yield $failConnection($index, CheckResponse::CHECK_INVALID_HOST);
                         continue;
@@ -217,7 +222,8 @@ class StatusChecker {
     /**
      * Close all open sockets
      */
-    protected function closeSockets() {
+    protected function closeSockets()
+    {
         foreach ($this->sockets as $socket) {
             // Attempt to close a socket
             try {
@@ -228,7 +234,8 @@ class StatusChecker {
         }
     }
 
-    public function check() {
+    public function check()
+    {
         foreach ($this->run() as $response) {
             yield $response;
         }
@@ -242,20 +249,22 @@ class StatusChecker {
      * @param int $timeout
      * @return mixed string|false IP address if it's resolved or false otherwise
      */
-    public static function getAddrByHost($host, $timeout = 1) {
+    public static function getAddrByHost($host, $timeout = 1)
+    {
         $matches = [];
         $result = false;
         $query = shell_exec("nslookup -timeout={$timeout} -retry=1 {$host}");
-        
+
         if (preg_match('/\nAddress: (.*)\n/', $query, $matches)) {
-            
+
             $result = trim($matches[1]);
         }
         $filtered = filter_var($result, FILTER_VALIDATE_IP);
         return $filtered;
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         // Just in case
         $this->closeSockets();
     }

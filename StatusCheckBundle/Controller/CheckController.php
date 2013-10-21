@@ -15,10 +15,12 @@ use ivanbatic\StatusCheckBundle\Model\CheckBatch;
 use ivanbatic\StatusCheckBundle\Library\StatusChecker;
 use Symfony\Component\HttpFoundation\Request;
 
-class CheckController extends Controller {
+class CheckController extends Controller
+{
 
     // Get request, made for testing
-    public function indexAction() {
+    public function indexAction()
+    {
 
         $hosts = [];
         $batch = new CheckBatch();
@@ -27,7 +29,7 @@ class CheckController extends Controller {
         }
 
         $checker = new StatusChecker($batch, true);
-        
+
         // works for local apache
         ob_implicit_flush(true);
         foreach ($checker->check() as $response) {
@@ -42,7 +44,8 @@ class CheckController extends Controller {
         exit();
     }
 
-    public function checkAction() {
+    public function checkAction()
+    {
         set_time_limit(0);
         $request = Request::createFromGlobals();
         $hosts = $request->request->get('hosts', []);
@@ -73,6 +76,16 @@ class CheckController extends Controller {
         };
         ob_implicit_flush(false);
         exit();
+    }
+
+    public function passToMongoAction()
+    {
+        return new \Symfony\Component\HttpFoundation\JsonResponse(['ok']);
+    }
+
+    public function checkMongoRouteAction()
+    {
+        return new \Symfony\Component\HttpFoundation\JsonResponse(['ok']);
     }
 
 }

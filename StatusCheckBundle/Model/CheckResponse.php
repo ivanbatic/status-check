@@ -8,7 +8,8 @@
 
 namespace ivanbatic\StatusCheckBundle\Model;
 
-class CheckResponse implements \JsonSerializable {
+class CheckResponse implements \JsonSerializable
+{
 
     const CHECK_UNINITIALIZED = 0;
     const CHECK_PENDING = 'pending';
@@ -49,48 +50,58 @@ class CheckResponse implements \JsonSerializable {
     protected $status = self::CHECK_UNINITIALIZED;
     protected $id;
 
-    public function __construct(Host $host) {
+    public function __construct(Host $host)
+    {
         $this->host = $host;
         $this->id = self::$ID;
         self::$ID++;
     }
 
-    public function getHost() {
+    public function getHost()
+    {
         return $this->host();
     }
 
-    public function getRedirect() {
+    public function getRedirect()
+    {
         return $this->redirect;
     }
 
-    public function setRedirect($redirect) {
+    public function setRedirect($redirect)
+    {
         $this->redirect = $redirect;
         return $this;
     }
 
-    public function getStatusCode() {
+    public function getStatusCode()
+    {
         return $this->statusCode;
     }
 
-    public function setStatusCode($statusCode) {
+    public function setStatusCode($statusCode)
+    {
         $this->statusCode = $statusCode;
         return $this;
     }
 
-    public function getContentLength() {
+    public function getContentLength()
+    {
         return $this->contentLength;
     }
 
-    public function setContentLength($contentLength = 0) {
+    public function setContentLength($contentLength = 0)
+    {
         $this->contentLength = $contentLength;
         return $this;
     }
 
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->status;
     }
 
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->status = $status;
         return $this;
     }
@@ -101,7 +112,8 @@ class CheckResponse implements \JsonSerializable {
      * @return \ivanbatic\StatusCheckBundle\Model\CheckResponse
      * @deprecated This is slow when body content is large
      */
-    public function parseResponseBody($responseBody) {
+    public function parseResponseBody($responseBody)
+    {
         // Extract content length
         $length = [];
         preg_match('/(?<=\bContent-Length:\s)(\d+)/', $responseBody, $length);
@@ -133,16 +145,19 @@ class CheckResponse implements \JsonSerializable {
         return $this;
     }
 
-    public function getParentId() {
+    public function getParentId()
+    {
         return $this->parentId;
     }
 
-    public function setParentId($parentId) {
+    public function setParentId($parentId)
+    {
         $this->parentId = $parentId;
         return $this;
     }
 
-    public function getRedirectLocation() {
+    public function getRedirectLocation()
+    {
         // Google+ returns circular redirects...
         if ($this->host->getOriginal() == $this->redirectLocation) {
             $this->setInfo('circular_redirecion');
@@ -163,16 +178,19 @@ class CheckResponse implements \JsonSerializable {
         }
     }
 
-    public function setRedirectLocation($redirectLocation) {
+    public function setRedirectLocation($redirectLocation)
+    {
         $this->redirectLocation = $redirectLocation;
         return $this;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $data = [
             'status_code'    => $this->getStatusCode(),
             'content_length' => $this->getContentLength(),
@@ -187,11 +205,13 @@ class CheckResponse implements \JsonSerializable {
         return $data;
     }
 
-    public function getInfo() {
+    public function getInfo()
+    {
         return $this->info;
     }
 
-    public function setInfo($info) {
+    public function setInfo($info)
+    {
         $this->info = $info;
         return $this;
     }

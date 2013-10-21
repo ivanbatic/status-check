@@ -1,4 +1,4 @@
-app.factory('streamingXhr', function() {
+app.factory('StreamingXhr', function() {
     var srvc = {
         create: function(url, method, async) {
             return new Request(url, method, async);

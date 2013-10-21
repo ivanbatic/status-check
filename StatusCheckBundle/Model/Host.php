@@ -8,7 +8,8 @@
 
 namespace ivanbatic\StatusCheckBundle\Model;
 
-class Host {
+class Host
+{
 
     const DEFAULT_SCHEME = 'http';
 
@@ -24,7 +25,8 @@ class Host {
     protected $query = '';
     protected $path = '/';
 
-    public function __construct($url) {
+    public function __construct($url)
+    {
 
         // If not a string, it's not good
         if (is_string($url)) {
@@ -64,11 +66,13 @@ class Host {
         }
     }
 
-    public function getHost() {
+    public function getHost()
+    {
         return $this->host;
     }
 
-    public function setHost($host) {
+    public function setHost($host)
+    {
         if (!is_string($host)) {
             throw new \InvalidArgumentException('Host argument must be a string.');
         }
@@ -76,47 +80,57 @@ class Host {
         return $this;
     }
 
-    public function getPort() {
+    public function getPort()
+    {
         return $this->port;
     }
 
-    public function setPort($port = 80) {
+    public function setPort($port = 80)
+    {
         $this->port = $port;
         return $this;
     }
 
-    public function getOriginal() {
+    public function getOriginal()
+    {
         return $this->original;
     }
 
-    protected function setOriginal($original) {
+    protected function setOriginal($original)
+    {
         $this->original = $original;
         return $this;
     }
 
-    public function getQuery() {
+    public function getQuery()
+    {
         return $this->query;
     }
 
-    public function setQuery($query) {
+    public function setQuery($query)
+    {
         $this->query = $query;
         return $this;
     }
 
-    public function getScheme() {
+    public function getScheme()
+    {
         return $this->scheme;
     }
 
-    public function setScheme($scheme) {
+    public function setScheme($scheme)
+    {
         $this->scheme = $scheme;
         return $this;
     }
 
-    public function getPath() {
+    public function getPath()
+    {
         return $this->path;
     }
 
-    public function setPath($path = '') {
+    public function setPath($path = '')
+    {
         $path = ltrim($path, '/');
         $this->path = $path;
         return $this;
@@ -126,7 +140,8 @@ class Host {
      * Create path part of a HTTP request
      * @return string
      */
-    public function getHttpRequestPath() {
+    public function getHttpRequestPath()
+    {
         $path = '/' . $this->path . ($this->query ? '?' . $this->query : '');
         $path = preg_replace('/(\/+)/', '/', $path);
         return $path;
@@ -136,7 +151,8 @@ class Host {
      * Create host part of a HTTP request
      * @return string
      */
-    public function getHttpRequestHost($host = null, $implicitPort = true, $preserveTrailingSlash = true) {
+    public function getHttpRequestHost($host = null, $implicitPort = true, $preserveTrailingSlash = true)
+    {
         // If the original url ends with /, append it
         // otherwise it goes in an endless loop with redirections 
         // that rewrite slashes
@@ -152,20 +168,24 @@ class Host {
         return $result;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->original;
     }
 
-    public function getParentId() {
+    public function getParentId()
+    {
         return $this->parentId;
     }
 
-    public function setParentId($id) {
+    public function setParentId($id)
+    {
         $this->parentId = $id;
         return $this;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 

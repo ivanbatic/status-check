@@ -11,6 +11,7 @@ and open the template in the editor.
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js"></script>
+        <script src="http://localhost:5150/socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></script>
     {% javascripts 
     '@ivanbaticStatusCheckBundle/Resources/public/app/*' 
@@ -34,7 +35,7 @@ and open the template in the editor.
         <h3>Website List</h3>
         <div class="row">
             <div class="col-lg-6 clearfix">
-                <form ng-submit="submitForm()" class="clearfix" ng-controller="InputController" >
+                <form ng-submit="submitToMongo()" class="clearfix" ng-controller="InputController" >
                     <p>Please enter one address per row. Currently: <span ng-class="{'text-danger': entries > 1000}" ng-bind="entries"></span></p>
                     <!--
                     Can't use ng-list here, there's a bug in Angular, 

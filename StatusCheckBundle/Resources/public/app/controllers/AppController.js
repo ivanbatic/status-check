@@ -1,4 +1,9 @@
-function AppController($scope) {
+function AppController($scope, SocketIOConnection) {
+    SocketIOConnection
+            .create('http://localhost:5150')
+            .setEventCallback('message', function(data) {
+        console.log('Received a messages', data);
+    })
     // Active page index
     $scope.activePage = 0;
     // Array of pages

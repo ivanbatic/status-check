@@ -1,4 +1,4 @@
-function InputController($scope, streamingXhr) {
+function InputController($scope, StreamingXhr, $http) {
     // Number of entries in the textarea
     $scope.entries = 0;
     // Textarea content
@@ -53,16 +53,17 @@ function InputController($scope, streamingXhr) {
                 : true;
     }
 
+
     /**
      * Sends the xhr request
      * @returns void
      */
     $scope.submitForm = function() {
         var formData = parseInput($scope.input);
-        // Store active page in case it changes during the request
-        var activePage = $scope.$parent.activePage;
         // Early break if input is invalid
         if (validateInput(formData) !== true) return;
+        // Store active page in case it changes during the request
+        var activePage = $scope.$parent.activePage;
 
         // Prepare a request object
         var stream = streamingXhr.create('check-status', 'POST');
@@ -92,5 +93,17 @@ function InputController($scope, streamingXhr) {
 
         // Send the request
         stream.fire();
+    }
+
+    $scope.submitToMongo = function() {
+        var formData = parseInput($scope.input);
+        // Early break if input is invalid
+        if (validateInput(formData) !== true) return;
+
+        $http.post('check-status', {
+            hosts: formData
+        }).success(function(response) {
+            console.log("Got response", response);
+        });
     }
 }

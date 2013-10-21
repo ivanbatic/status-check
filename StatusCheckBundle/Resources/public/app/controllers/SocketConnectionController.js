@@ -1,0 +1,5 @@
+function SocketConnectionController($scope) {
+
+}
+
+
