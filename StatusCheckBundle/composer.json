@@ -1,0 +1,9 @@
+{
+    "name": "ivanbatic/status-check-bundle",
+    "type": "symfony-bundle",
+    "require": {
+        "php": ">=5.5",
+        "doctrine/mongodb-odm": "1.0.*@dev",
+        "doctrine/mongodb-odm-bundle": "3.0.*@dev"
+    }
+}
