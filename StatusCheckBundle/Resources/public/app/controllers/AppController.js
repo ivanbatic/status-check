@@ -1,11 +1,15 @@
-function AppController($scope, SocketIOConnection) {
-    SocketIOConnection
-            .create('http://localhost:5150')
-            .setEventCallback('message', function(data) {
-        console.log('Received a messages', data);
-    })
+function AppController($scope, SocketIOConnection, $http) {
+    try {
+        SocketIOConnection
+                .create('http://localhost:5150')
+                .setEventCallback('data_update', updateData);
+    } catch (ex) {
+        $scope.error = "Couldn't connect to the socket server, please try again later.";
+    }
     // Active page index
     $scope.activePage = 0;
+    $scope.error;
+
     // Array of pages
     $scope.pages = [{
             records: [],
@@ -16,10 +20,14 @@ function AppController($scope, SocketIOConnection) {
      * Adds/Updates a record
      * @param object newRecord
      * @param int page index
+     * @deprecated Used in php version
      */
     $scope.updateRecord = function(record, page) {
         // Init
         var updated = false;
+
+        // Normalize Mongo data
+        if (record._id) record.id = record._id;
 
         // Check if this website is already in the list
         // If so, update the existing record
@@ -48,6 +56,38 @@ function AppController($scope, SocketIOConnection) {
                 $scope.pages[page].records.push(record);
             }
         }
+    };
+
+    function updateData(data) {
+        for (var i = 0; i < data.length; i++) {
+            var pageIndex = data[i].page_index;
+            // Normalize mongo
+            if (data[i]._id) data[i].id = data[i]._id;
+
+            // Create missing pages
+            while ($scope.pages[pageIndex] === undefined) $scope.createPage();
+
+            var updated = false;
+            // Update where neccessary, insert otherwise
+            for (var j = 0; j < $scope.pages[pageIndex].records.length; j++) {
+                if ($scope.pages[pageIndex].records[j].id === data[i].id) {
+                    $scope.pages[pageIndex].records[j] = data[i];
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) $scope.pages[pageIndex].records.push(data[i]);
+        }
+        $scope.$apply();
     }
+
+    /**
+     * Adds a new page
+     */
+    $scope.createPage = function() {
+        $scope.pages.push({records: [], progress: 0});
+        $scope.activePage = $scope.pages.length - 1;
+    }
+
 
 }

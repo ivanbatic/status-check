@@ -27,6 +27,16 @@ $collection->add('ivanbatic_status_check_post', new Route('/check-status', array
     ), array(), array(), '', array(), array('POST'))
 );
 
+$collection->add('ivanbatic_status_check_delete_page_post', new Route('/check-status/close-page', array(
+    '_controller' => 'ivanbaticStatusCheckBundle:Check:deletePageFromMongo',
+    ), array(), array(), '', array(), array('POST'))
+);
+
+$collection->add('ivanbatic_status_check_delete_page_get', new Route('/check-status/close-page', array(
+    '_controller' => 'ivanbaticStatusCheckBundle:Check:deleteFirstPageFromMongo'
+    ))
+);
+
 $collection->add('ivanbatic_status_check_mongo_get', new Route('/', array(
     '_controller' => 'ivanbaticStatusCheckBundle:App:index'))
 );

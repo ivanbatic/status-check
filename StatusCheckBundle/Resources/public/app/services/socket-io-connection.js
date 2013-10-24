@@ -23,7 +23,8 @@ app.factory('SocketIOConnection', function() {
             'anything',
             'reconnect_failed',
             'reconnect',
-            'reconnecting'
+            'reconnecting',
+            'data_update'
         ];
 
         // Callback functions for events
@@ -31,7 +32,13 @@ app.factory('SocketIOConnection', function() {
 
         this.connect = function(url) {
             // Connect to the socket
+            try {
             socket = io.connect(url);
+        } catch (ex){
+                console.log("Throwing");
+                return;
+            throw ex;
+        }
 
             // Distribute events and bind callbacks
             for (var i in events) {

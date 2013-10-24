@@ -189,4 +189,18 @@ class Host
         return $this->id;
     }
 
+    public function toArray()
+    {
+        return [
+            'id'        => $this->getId(),
+            'original'  => $this->getOriginal(),
+            'host'      => $this->getHost(),
+            'port'      => $this->getPort(),
+            'scheme'    => $this->getScheme(),
+            'query'     => $this->getQuery(),
+            'path'      => $this->getPath(),
+            'parent_id' => $this->getParentId()
+        ];
+    }
+
 }

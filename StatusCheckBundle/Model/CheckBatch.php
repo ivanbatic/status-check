@@ -8,10 +8,18 @@
 
 namespace ivanbatic\StatusCheckBundle\Model;
 
-class CheckBatch implements \Iterator, \ArrayAccess, \Countable
+class CheckBatch implements \Iterator, \ArrayAccess, \Countable, \JsonSerializable
 {
 
     protected $hosts = [];
+    protected $requestTime;
+    protected $requestClient;
+    protected $pageIndex = 0;
+
+    public function __construct()
+    {
+        $this->setRequestTime(time());
+    }
 
     public function addHost(Host $host)
     {
@@ -39,6 +47,17 @@ class CheckBatch implements \Iterator, \ArrayAccess, \Countable
     public function rewind()
     {
         reset($this->hosts);
+    }
+
+    public function getPageIndex()
+    {
+        return $this->pageIndex;
+    }
+
+    public function setPageIndex($pageIndex)
+    {
+        $this->pageIndex = $pageIndex;
+        return $this;
     }
 
     public function valid()
@@ -72,6 +91,58 @@ class CheckBatch implements \Iterator, \ArrayAccess, \Countable
     public function count()
     {
         return count($this->hosts);
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    public function getHosts()
+    {
+        return $this->hosts;
+    }
+
+    public function setHosts($hosts)
+    {
+        $this->hosts = $hosts;
+        return $this;
+    }
+
+    public function getRequestTime()
+    {
+        return $this->requestTime;
+    }
+
+    protected function setRequestTime($requestTime)
+    {
+        $this->requestTime = $requestTime;
+        return $this;
+    }
+
+    public function getRequestClient()
+    {
+        return $this->requestClient;
+    }
+
+    public function setRequestClient($requestClient)
+    {
+        $this->requestClient = $requestClient;
+        return $this;
+    }
+
+    public function toArray()
+    {
+        $hosts = [];
+        foreach ($this->hosts as $host) {
+            $hosts[] = $host->toArray();
+        }
+        return [
+            'hosts'          => $hosts,
+            'request_time'   => $this->getRequestTime(),
+            'request_client' => $this->getRequestClient(),
+            'page_index'     => $this->getPageIndex()
+        ];
     }
 
 }

@@ -8,6 +8,18 @@ function InputController($scope, StreamingXhr, $http) {
     // Message below input field
     $scope.inputStatus = '';
 
+    $scope.closePageButton = {
+        default: 'Close Page',
+        closing: 'Closing...',
+        text: 'Close Page'
+    };
+    $scope.startButton = {
+        default: 'Start the Awesomness',
+        clearing: 'Clearing page...',
+        sending: 'Sending a new request...',
+        text: 'Start the Awesomness'
+    }
+
     /**
      * Filters the input content to remove non-url entries
      */
@@ -95,15 +107,74 @@ function InputController($scope, StreamingXhr, $http) {
         stream.fire();
     }
 
+    /**
+     * Submit the form, mongo style
+     * First, the active page needs to be closed,
+     * when it is, then we can send a new request 
+     */
     $scope.submitToMongo = function() {
+        console.log("Submitting");
         var formData = parseInput($scope.input);
         // Early break if input is invalid
         if (validateInput(formData) !== true) return;
+        var page = $scope.$parent.activePage;
 
-        $http.post('check-status', {
-            hosts: formData
+        $scope.startButton.text = $scope.startButton.clearing;
+        
+        closeMongoPage(page, function() {
+            $scope.startButton.text = $scope.startButton.sending;
+            $scope.pages.splice(page, 1, {records: [], progress: 0});
+            $http({
+                method: 'post',
+                url: 'check-status',
+                data: $.param({hosts: formData, page_index: page}),
+                responseType: 'json',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).success(function(response) {
+                $scope.startButton.text = $scope.startButton.default;
+                for (var i = 0; i < response.length; i++) {
+                    $scope.updateRecord(response[i], page);
+                }
+            });
+        });
+    }
+
+
+    function closeMongoPage(pageIndex, callback) {
+        $http({
+            method: 'post',
+            url: 'check-status/close-page',
+            data: $.param({page_index: pageIndex}),
+            responseType: 'json',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         }).success(function(response) {
-            console.log("Got response", response);
+            setTimeout(function() {
+                $scope.$apply();
+            });
+            if (typeof callback === 'function') {
+                callback(response);
+            }
+        });
+    }
+
+    /**
+     * Sets an active page
+     * @param int page index
+     */
+    $scope.setActivePage = function(page) {
+        $scope.$parent.activePage = page;
+    }
+
+    /**
+     * Removes a page
+     * @param int page index
+     */
+    $scope.closePage = function(page) {
+        $scope.closePageButton.text = $scope.closePageButton.closing;
+        closeMongoPage(page, function() {
+            $scope.pages.splice(page, 1);
+            $scope.setActivePage(0);
+            $scope.closePageButton.text = $scope.closePageButton.default;
         });
     }
 }

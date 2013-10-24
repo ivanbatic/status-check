@@ -14,6 +14,8 @@ use ivanbatic\StatusCheckBundle\Model\Host;
 use ivanbatic\StatusCheckBundle\Model\CheckBatch;
 use ivanbatic\StatusCheckBundle\Library\StatusChecker;
 use Symfony\Component\HttpFoundation\Request;
+use ivanbatic\StatusCheckBundle\Library\MongoRouter;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CheckController extends Controller
 {
@@ -23,11 +25,7 @@ class CheckController extends Controller
     {
 
         $hosts = [];
-        $batch = new CheckBatch();
-        foreach ($hosts as $host) {
-            $batch->addHost(new Host($host));
-        }
-
+        $batch = $this->createBatch($hosts);
         $checker = new StatusChecker($batch, true);
 
         // works for local apache
@@ -55,16 +53,7 @@ class CheckController extends Controller
             return json_encode('too_many_hosts');
         }
 
-        $batch = new CheckBatch();
-        foreach ($hosts as $host) {
-            try {
-                $h = new Host($host);
-                $batch->addHost($h);
-            } catch (\Exception $e) {
-                // probably caught a malformed url
-            }
-        }
-
+        $batch = $this->createBatch($hosts);
         $checker = new StatusChecker($batch);
         ob_implicit_flush(true);
         foreach ($checker->check() as $response) {
@@ -78,14 +67,69 @@ class CheckController extends Controller
         exit();
     }
 
+    /**
+     * Post request to /status-check goes here now
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function passToMongoAction()
     {
-        return new \Symfony\Component\HttpFoundation\JsonResponse(['ok']);
+        $request = Request::createFromGlobals();
+        $hosts = $request->request->get('hosts', []);
+        if (empty($hosts)) {
+            exit();
+        } elseif (count($hosts) > 1000) {
+            return json_encode('too_many_hosts');
+        }
+        $batch = $this->createBatch($hosts);
+        $mongoRouter = new MongoRouter($this->get('doctrine_mongodb')->getManager());
+        $inserted = $mongoRouter->insertBatch($batch->setPageIndex($request->request->get('page_index', 0)));
+        return new JsonResponse($inserted);
     }
 
-    public function checkMongoRouteAction()
+    /**
+     * Creates a new batch out of given hosts
+     * @param array $hosts
+     * @return \ivanbatic\StatusCheckBundle\Model\CheckBatch
+     */
+    protected function createBatch(array $hosts)
     {
-        return new \Symfony\Component\HttpFoundation\JsonResponse(['ok']);
+        $batch = new CheckBatch();
+        $batch->setRequestClient($_SERVER['REMOTE_ADDR']);
+        foreach ($hosts as $host) {
+            try {
+                $h = new Host($host);
+                $batch->addHost($h);
+            } catch (\Exception $e) {
+                // probably caught a malformed url
+            }
+        }
+        return $batch;
+    }
+
+    public function deletePageFromMongoAction()
+    {
+        $mongoRouter = new MongoRouter($this->get('doctrine_mongodb')->getManager());
+        $request = Request::createFromGlobals();
+        $pageIndex = $request->request->get('page_index');
+
+        $mongoRouter = new MongoRouter($this->get('doctrine_mongodb')->getManager());
+        $result = $mongoRouter->deleteClientPage($pageIndex, $_SERVER['REMOTE_ADDR']);
+
+        return new JsonResponse([
+            'client'     => $_SERVER['REMOTE_ADDR'],
+            'page_index' => $pageIndex,
+            'success'    => $result
+        ]);
+    }
+
+    public function deleteFirstPageFromMongoAction()
+    {
+        $request = Request::createFromGlobals();
+        $pageIndex = $request->request->get('page_index');
+
+        $mongoRouter = new MongoRouter($this->get('doctrine_mongodb')->getManager());
+        $result = $mongoRouter->deleteClientPage(1, '127.0.0.1');
+        return new JsonResponse(['success' => $result]);
     }
 
 }

@@ -9,8 +9,8 @@ and open the template in the editor.
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.min.js"></script>
         <script src="http://localhost:5150/socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"></script>
     {% javascripts 
@@ -19,10 +19,10 @@ and open the template in the editor.
     '@ivanbaticStatusCheckBundle/Resources/public/app/directives/*' 
     '@ivanbaticStatusCheckBundle/Resources/public/app/services/*' 
     %}
-    <script src="{{ asset_url }}"></script>
+    <script src="{{ asset_url}}"></script>
     {% endjavascripts %}
     {% stylesheets '@ivanbaticStatusCheckBundle/Resources/public/css/*' filter='cssrewrite' %}
-    <link rel="stylesheet" href="{{ asset_url }}" />
+    <link rel="stylesheet" href="{{ asset_url}}" />
     {% endstylesheets %}
 </head>
 <body>
@@ -31,11 +31,12 @@ and open the template in the editor.
             <h1>Status Checker</h1>
             <p class="lead">Symfony2 Bundle for fetching website content</p>
         </div>
+        <div class="alert alert-danger" ng-show="error" ng-bind="error"></div>
 
         <h3>Website List</h3>
         <div class="row">
-            <div class="col-lg-6 clearfix">
-                <form ng-submit="submitToMongo()" class="clearfix" ng-controller="InputController" >
+            <div class="col-lg-6 clearfix" ng-controller="InputController">
+                <form ng-submit="submitToMongo()" class="clearfix">
                     <p>Please enter one address per row. Currently: <span ng-class="{'text-danger': entries > 1000}" ng-bind="entries"></span></p>
                     <!--
                     Can't use ng-list here, there's a bug in Angular, 
@@ -45,16 +46,31 @@ and open the template in the editor.
                     <textarea tabindex="1" class="scrollable-block form-control" rows="5" wrap="off" required textarea-autoresize ng-model="input"></textarea>
                     <div class="button-container clearfix" id="control_container">
                         <span ng-bind="inputStatus" class="pull-left hidden-xs text-danger input-warning"></span>
-                        <button type="submit" tabindex="2" class="btn btn-primary pull-right" ng-disabled="entries > 1000">Start the Awesomness</button>
+                        <button 
+                            type="submit" 
+                            tabindex="2" 
+                            class="btn btn-primary pull-right" 
+                            ng-bind="startButton.text"
+                            ng-disabled="(entries > 1000) || startButton.text != startButton.default">
+                            Start the Awesomness
+                        </button>
                         <button type="reset" tabindex="3" class="btn btn-default pull-right">Reset</button>
                         <button ng-click="filterInput()" type="button" tabindex="4" class="btn btn-default pull-right">Filter</button>
                     </div>
                 </form>
-                <div class="clearfix pull-right" id="pagination_holder" ng-controller="PageController">
+                <div class="clearfix pull-right" id="pagination_holder">
                     <button type="button" ng-click="createPage()" class="mt20 mr1em btn pull-right btn-primary">New Page</button>
-                    <button ng-show="pages.length > 1" ng-click="closePage()" type="button" class="mt20 mr1em btn-danger btn pull-right">Close Page</button>
+                    <button 
+                        type="button" 
+                        class="mt20 mr1em btn-danger btn pull-right" 
+                        ng-show="pages.length > 1" 
+                        ng-click="closePage(activePage)" 
+                        ng-disabled="closePageButton.text != closePageButton.default" 
+                        ng-bind="closePageButton.text">
+                        Close Page
+                    </button>
                     <ul class="pagination pull-right mr1em" ng-show="pages.length > 1">
-                        <li ng-class="{active: $index == activePage}" ng-click="setActivePage($index)" ng-repeat="page in pages"><a href="#" ng-bind="$index+1"></a></li>
+                        <li ng-class="{active: $index == activePage}" ng-click="setActivePage($index)" ng-repeat="page in pages"><a href="#" ng-bind="$index + 1"></a></li>
                     </ul>
                 </div>
             </div>
@@ -77,9 +93,9 @@ and open the template in the editor.
                     <tbody>
                         <tr ng-repeat="check in pages[activePage].records" ng-class="tableClass(check.status)">
                             <td class="col-id">
-                                <span ng-bind="check.id"></span>
+                                <span ng-bind="$index + 1"></span>
                                 <span ng-show="check.parent_id" class="glyphicon glyphicon-sort-by-attributes-alt">
-                                    <span ng-bind=" '(' + check.parent_id+ ')' " class="redirection-parent"></span>
+                                    <span ng-bind=" '(' + check.parent_id + ')'" class="redirection-parent"></span>
                                 </span>
                             </td>
                             <td class="col-status">

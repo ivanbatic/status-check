@@ -7,7 +7,8 @@ function ResponseTableController($scope) {
         'done',
         'invalid_host',
         'stream_error',
-        'success'
+        'success',
+        'failed'
     ];
 
     /**
@@ -23,6 +24,7 @@ function ResponseTableController($scope) {
             case 'broken_pipe':
             case 'connection_failed':
             case 'invalid_host':
+            case 'failed':
             case 'stream_error':
                 return 'danger';
             case 'socket_open':
