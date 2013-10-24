@@ -124,12 +124,12 @@ class CheckController extends Controller
 
     public function deleteFirstPageFromMongoAction()
     {
-        $request = Request::createFromGlobals();
-        $pageIndex = $request->request->get('page_index');
-
-        $mongoRouter = new MongoRouter($this->get('doctrine_mongodb')->getManager());
-        $result = $mongoRouter->deleteClientPage(1, '127.0.0.1');
-        return new JsonResponse(['success' => $result]);
+//        $request = Request::createFromGlobals();
+//        $pageIndex = $request->request->get('page_index');
+//
+//        $mongoRouter = new MongoRouter($this->get('doctrine_mongodb')->getManager());
+//        $result = $mongoRouter->deleteClientPage(1, '127.0.0.1');
+//        return new JsonResponse(['success' => $result]);
     }
 
 }
